@@ -18,7 +18,7 @@ public class Mastermind {
         System.out.println("Zaczynamy grę!");
         System.out.println("Losuję hasło...");
         randomlySelectedPassword = drawPassword();
-        System.out.println(randomlySelectedPassword);
+     //   System.out.println(randomlySelectedPassword);
         System.out.println("Hasło gotowe. Składa się z " + passwordLength + " znaków. Spróbuj je odgadnąć. Masz 10 prób." +
                 " Powodzenia!");
         System.out.println("Dostępne litery to: " + Arrays.toString(passwordCharPool) + "\nLitery mogą się powtarzać. :)");
@@ -43,8 +43,8 @@ public class Mastermind {
             playerPassword = guessPassword();
             System.out.println("Sprawdzam podane hasło...");
             boolean[][] results = checkIfPasswordGuessed();
-            System.out.println(Arrays.toString(results[0]));
-            System.out.println(Arrays.toString(results[1]));
+          //  System.out.println(Arrays.toString(results[0]));
+          //  System.out.println(Arrays.toString(results[1]));
             numberOfBlackPegs = countNumberOfPegs(results, 1);
             numberOfWhitePegs = countNumberOfPegs(results, 2);
             System.out.println("Czarne pinezki: " + numberOfBlackPegs + ". Białe pinezki: " + numberOfWhitePegs + ".");
