@@ -3,104 +3,86 @@ import java.util.Random;
 import java.util.Scanner;
 
 public class Mastermind {
-    static char[] pulaZnakowHasla = {'g', 'j', 'k', 'f', 'r', 'd', 'a', 'e'};
-    static char[] wylosowaneHaslo;
-    static char[] hasloUzytkownika;
-    static int liczbaProb = 0;
-    static int dlugoscHasla = 4;
+    static char[] passwordCharPool = {'g', 'j', 'k', 'f', 'r', 'd', 'a', 'e'};
+    static char[] randomlySelectedPassword;
+    static char[] playerPassword;
+    static int attemptCount = 0;
+    static int passwordLength = 4;
 
     public static void main(String[] args) {
         System.out.println("Zaczynamy grę!");
         System.out.println("Losuję hasło...");
-        wylosowaneHaslo = losujHaslo();
-        System.out.println(wylosowaneHaslo);
-        System.out.println("Hasło gotowe. Składa się z " + dlugoscHasla + " znaków. Spróbuj je odgadnąć. Masz 10 prób. Powodzenia!");
-        System.out.println("Dostępne litery to: " + Arrays.toString(pulaZnakowHasla) + "\nLitery mogą się powtarzać. :)");
-        int iloscCzarnych;
-        int iloscBialych;
+        randomlySelectedPassword = drawPassword();
+        System.out.println(randomlySelectedPassword);
+        System.out.println("Hasło gotowe. Składa się z " + passwordLength + " znaków. Spróbuj je odgadnąć. Masz 10 prób." +
+                " Powodzenia!");
+        System.out.println("Dostępne litery to: " + Arrays.toString(passwordCharPool) + "\nLitery mogą się powtarzać. :)");
+        int numberOfBlackPegs;
+        int numberOfWhitePegs;
         do {
-            liczbaProb++;
-            System.out.println("Podejście nr " + liczbaProb + ". Podaj hasło");
-            hasloUzytkownika = podajHaslo();
+            attemptCount++;
+            System.out.println("Podejście nr " + attemptCount + ". Podaj hasło");
+            playerPassword = guessPassword();
             System.out.println("Sprawdzam podane hasło...");
-            boolean[][] tablicaRezultatow = sprawdzHaslo();
+            boolean[][] tablicaRezultatow = checkIfPasswordGuessed();
             System.out.println(Arrays.toString(tablicaRezultatow[0]));
             System.out.println(Arrays.toString(tablicaRezultatow[1]));
-            iloscCzarnych = policzIloscPinesek(tablicaRezultatow, 1);
-            iloscBialych = policzIloscPinesek(tablicaRezultatow, 2);
-            System.out.println("Czarne pinezki: " + iloscCzarnych + ". Białe pinezki: " + iloscBialych + ".");
-            if (iloscCzarnych == dlugoscHasla) {
-                System.out.println("Brawo. Odgadłeś hasło. Liczba prób: " + liczbaProb);
+            numberOfBlackPegs = countNumberOfPegs(tablicaRezultatow, 1);
+            numberOfWhitePegs = countNumberOfPegs(tablicaRezultatow, 2);
+            System.out.println("Czarne pinezki: " + numberOfBlackPegs + ". Białe pinezki: " + numberOfWhitePegs + ".");
+            if (numberOfBlackPegs == passwordLength) {
+                System.out.println("Brawo. Odgadłeś hasło. Liczba prób: " + attemptCount);
             }
-        } while (liczbaProb <= 10 && iloscCzarnych != dlugoscHasla);
-        if (liczbaProb > 10 && iloscCzarnych != dlugoscHasla) {
-            System.out.println("Niestety wyczerpałeś liczbę prób :(. Prawidłowe hasło to: " + Arrays.toString(wylosowaneHaslo));
+        } while (attemptCount <= 10 && numberOfBlackPegs != passwordLength);
+        if (attemptCount > 10 && numberOfBlackPegs != passwordLength) {
+            System.out.println("Niestety wyczerpałeś liczbę prób :(. Prawidłowe hasło to: " +
+                    Arrays.toString(randomlySelectedPassword));
         }
     }
 
-    static char[] losujHaslo() {
-        Random losowanie = new Random();
-        char[] haslo = new char[dlugoscHasla];
-        for (int i = 0; i < dlugoscHasla; i++) {
-            int pozycjaWtablicy = losowanie.nextInt(pulaZnakowHasla.length);
-            haslo[i] = pulaZnakowHasla[pozycjaWtablicy];
+    static char[] drawPassword() {
+        Random draw = new Random();
+        char[] password = new char[passwordLength];
+        for (int i = 0; i < passwordLength; i++) {
+            int letterIndexInCharPool = draw.nextInt(passwordCharPool.length);
+            password[i] = passwordCharPool[letterIndexInCharPool];
         }
-        return haslo;
+        return password;
     }
 
-    static char[] podajHaslo() {
-        Scanner podawaneHaslo = new Scanner(System.in);
-        String hasloString = podawaneHaslo.nextLine();
-        char[] probaHasla = new char[dlugoscHasla];
-        for (int i = 0; i < dlugoscHasla; i++) {
-            probaHasla[i] = hasloString.charAt(i);
+    static char[] guessPassword() {
+        Scanner scanner = new Scanner(System.in);
+        String playerPasswordAsString = scanner.nextLine();
+        char[] passwordAttempt = new char[passwordLength];
+        for (int i = 0; i < passwordLength; i++) {
+            passwordAttempt[i] = playerPasswordAsString.charAt(i);
         }
-        return probaHasla;
+        return passwordAttempt;
     }
 
-    static boolean[][] sprawdzHaslo() {
-        // biala pinezka - trafiona literka + niewlasciwa pozycja literki
-        //czarna pinezka - trafiona literka + trafiona pozycja literki
-
-     /*   boolean[] bialaPinezka = new boolean[dlugoscHasla], czarnaPinezka = new boolean[dlugoscHasla];
-
-        for (int i = 0; i < czarnaPinezka.length; i++) {
-            if (hasloUzytkownika[i] == wylosowaneHaslo[i]) {
-                czarnaPinezka[i] = true;
-                iloscCzarnych++;
+    static boolean[][] checkIfPasswordGuessed() {
+        boolean[][] pegTable = new boolean[2][4];
+        for (int playerX = 0; playerX < pegTable[0].length; playerX++) {
+            if (playerPassword[playerX] == randomlySelectedPassword[playerX]) {
+                pegTable[0][playerX] = true;
                 continue;
             }
-            for (int j = 0; j < czarnaPinezka.length; j++) {
-                if (hasloUzytkownika[j] == wylosowaneHaslo[i]) {
-                    bialaPinezka[i] = true;
-                    iloscBialych++;
-                }
-            }
-        }*/
-        //true false false false
-        //false true true false
-        boolean[][] tablicaPinesek = new boolean[2][4];
-        for (int xUzytkownika = 0; xUzytkownika < tablicaPinesek[0].length; xUzytkownika++) {
-            if (hasloUzytkownika[xUzytkownika] == wylosowaneHaslo[xUzytkownika]) {
-                tablicaPinesek[0][xUzytkownika] = true;
-                continue;
-            }
-            for (int xHaslo = 0; xHaslo < tablicaPinesek[1].length; xHaslo++) {
-                if (hasloUzytkownika[xHaslo] == wylosowaneHaslo[xUzytkownika]) {
-                    tablicaPinesek[1][xHaslo] = true;
+            for (int passwordX = 0; passwordX < pegTable[1].length; passwordX++) {
+                if (playerPassword[passwordX] == randomlySelectedPassword[playerX]) {
+                    pegTable[1][passwordX] = true;
                 }
             }
         }
-        return tablicaPinesek;
+        return pegTable;
     }
 
-    static int policzIloscPinesek(boolean[][] pinezki, int rzadTablicy) {
-        int iloscPinesek = 0;
-        for (int x = 0; x < pinezki[rzadTablicy - 1].length; x++) {
-            if (pinezki[rzadTablicy - 1][x]){
-                iloscPinesek++;
+    static int countNumberOfPegs(boolean[][] pegs, int pegTableRow) {
+        int numberOfPegs = 0;
+        for (int x = 0; x < pegs[pegTableRow - 1].length; x++) {
+            if (pegs[pegTableRow - 1][x]){
+                numberOfPegs++;
             }
         }
-        return iloscPinesek;
+        return numberOfPegs;
     }
 }
