@@ -10,6 +10,11 @@ public class Mastermind {
     static int passwordLength = 4;
 
     public static void main(String[] args) {
+        setupGame();
+        playGame();
+    }
+
+    static void setupGame() {
         System.out.println("Zaczynamy grę!");
         System.out.println("Losuję hasło...");
         randomlySelectedPassword = drawPassword();
@@ -17,27 +22,6 @@ public class Mastermind {
         System.out.println("Hasło gotowe. Składa się z " + passwordLength + " znaków. Spróbuj je odgadnąć. Masz 10 prób." +
                 " Powodzenia!");
         System.out.println("Dostępne litery to: " + Arrays.toString(passwordCharPool) + "\nLitery mogą się powtarzać. :)");
-        int numberOfBlackPegs;
-        int numberOfWhitePegs;
-        do {
-            attemptCount++;
-            System.out.println("Podejście nr " + attemptCount + ". Podaj hasło");
-            playerPassword = guessPassword();
-            System.out.println("Sprawdzam podane hasło...");
-            boolean[][] tablicaRezultatow = checkIfPasswordGuessed();
-            System.out.println(Arrays.toString(tablicaRezultatow[0]));
-            System.out.println(Arrays.toString(tablicaRezultatow[1]));
-            numberOfBlackPegs = countNumberOfPegs(tablicaRezultatow, 1);
-            numberOfWhitePegs = countNumberOfPegs(tablicaRezultatow, 2);
-            System.out.println("Czarne pinezki: " + numberOfBlackPegs + ". Białe pinezki: " + numberOfWhitePegs + ".");
-            if (numberOfBlackPegs == passwordLength) {
-                System.out.println("Brawo. Odgadłeś hasło. Liczba prób: " + attemptCount);
-            }
-        } while (attemptCount <= 10 && numberOfBlackPegs != passwordLength);
-        if (attemptCount > 10 && numberOfBlackPegs != passwordLength) {
-            System.out.println("Niestety wyczerpałeś liczbę prób :(. Prawidłowe hasło to: " +
-                    Arrays.toString(randomlySelectedPassword));
-        }
     }
 
     static char[] drawPassword() {
@@ -48,6 +32,31 @@ public class Mastermind {
             password[i] = passwordCharPool[letterIndexInCharPool];
         }
         return password;
+    }
+
+    static void playGame() {
+        int numberOfBlackPegs;
+        int numberOfWhitePegs;
+        do {
+            attemptCount++;
+            System.out.println("Podejście nr " + attemptCount + ". Podaj hasło");
+            playerPassword = guessPassword();
+            System.out.println("Sprawdzam podane hasło...");
+            boolean[][] results = checkIfPasswordGuessed();
+            System.out.println(Arrays.toString(results[0]));
+            System.out.println(Arrays.toString(results[1]));
+            numberOfBlackPegs = countNumberOfPegs(results, 1);
+            numberOfWhitePegs = countNumberOfPegs(results, 2);
+            System.out.println("Czarne pinezki: " + numberOfBlackPegs + ". Białe pinezki: " + numberOfWhitePegs + ".");
+            if (numberOfBlackPegs == passwordLength) {
+                System.out.println("Brawo. Odgadłeś hasło. Liczba prób: " + attemptCount);
+            }
+        } while (attemptCount < 10 && numberOfBlackPegs != passwordLength);
+        attemptCount++;
+        if (attemptCount > 10 && numberOfBlackPegs != passwordLength) {
+            System.out.println("Niestety wyczerpałeś liczbę prób :(. Prawidłowe hasło to: " +
+                    Arrays.toString(randomlySelectedPassword));
+        }
     }
 
     static char[] guessPassword() {
@@ -79,7 +88,7 @@ public class Mastermind {
     static int countNumberOfPegs(boolean[][] pegs, int pegTableRow) {
         int numberOfPegs = 0;
         for (int x = 0; x < pegs[pegTableRow - 1].length; x++) {
-            if (pegs[pegTableRow - 1][x]){
+            if (pegs[pegTableRow - 1][x]) {
                 numberOfPegs++;
             }
         }
