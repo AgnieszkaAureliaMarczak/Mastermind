@@ -5,7 +5,7 @@ import java.util.Scanner;
 public class Mastermind {
     static char[] passwordCharPool = {'g', 'j', 'k', 'f', 'r', 'd', 'a', 'e'};
     static char[] randomlySelectedPassword;
-    static char[] playerPassword;
+    static char[] playersPassword;
     static int attemptCount = 0;
     static int passwordLength = 4;
 
@@ -19,9 +19,10 @@ public class Mastermind {
         System.out.println("Losuję hasło...");
         randomlySelectedPassword = drawPassword();
      //   System.out.println(randomlySelectedPassword);
-        System.out.println("Hasło gotowe. Składa się z " + passwordLength + " znaków. Spróbuj je odgadnąć. Masz 10 prób." +
-                " Powodzenia!");
-        System.out.println("Dostępne litery to: " + Arrays.toString(passwordCharPool) + "\nLitery mogą się powtarzać. :)");
+        System.out.println("Hasło gotowe. Składa się z " + passwordLength + " znaków. Spróbuj je odgadnąć. " +
+                "Masz 10 prób. Powodzenia!");
+        System.out.println("Dostępne litery to: " + Arrays.toString(passwordCharPool) +
+                "Litery mogą się powtarzać. :)");
     }
 
     static char[] drawPassword() {
@@ -40,11 +41,11 @@ public class Mastermind {
         do {
             attemptCount++;
             System.out.println("Podejście nr " + attemptCount + ". Podaj hasło");
-            playerPassword = guessPassword();
+            playersPassword = guessPassword();
             System.out.println("Sprawdzam podane hasło...");
             boolean[][] results = checkIfPasswordGuessed();
-          //  System.out.println(Arrays.toString(results[0]));
-          //  System.out.println(Arrays.toString(results[1]));
+         //   System.out.println(Arrays.toString(results[0]));
+         //   System.out.println(Arrays.toString(results[1]));
             numberOfBlackPegs = countNumberOfPegs(results, 1);
             numberOfWhitePegs = countNumberOfPegs(results, 2);
             System.out.println("Czarne pinezki: " + numberOfBlackPegs + ". Białe pinezki: " + numberOfWhitePegs + ".");
@@ -61,34 +62,34 @@ public class Mastermind {
 
     static char[] guessPassword() {
         Scanner scanner = new Scanner(System.in);
-        String playerPasswordAsString = scanner.nextLine();
-        char[] passwordAttempt = new char[passwordLength];
+        String playersPasswordAsString = scanner.nextLine();
+        char[] passwordTry = new char[passwordLength];
         for (int i = 0; i < passwordLength; i++) {
-            passwordAttempt[i] = playerPasswordAsString.charAt(i);
+            passwordTry[i] = playersPasswordAsString.charAt(i);
         }
-        return passwordAttempt;
+        return passwordTry;
     }
 
     static boolean[][] checkIfPasswordGuessed() {
-        boolean[][] pegTable = new boolean[2][4];
-        for (int playerX = 0; playerX < pegTable[0].length; playerX++) {
-            if (playerPassword[playerX] == randomlySelectedPassword[playerX]) {
-                pegTable[0][playerX] = true;
+        boolean[][] pegArray = new boolean[2][4];
+        for (int playerX = 0; playerX < pegArray[0].length; playerX++) {
+            if (playersPassword[playerX] == randomlySelectedPassword[playerX]) {
+                pegArray[0][playerX] = true;
                 continue;
             }
-            for (int passwordX = 0; passwordX < pegTable[1].length; passwordX++) {
-                if (playerPassword[passwordX] == randomlySelectedPassword[playerX]) {
-                    pegTable[1][passwordX] = true;
+            for (int passwordX = 0; passwordX < pegArray[1].length; passwordX++) {
+                if (playersPassword[passwordX] == randomlySelectedPassword[playerX]) {
+                    pegArray[1][passwordX] = true;
                 }
             }
         }
-        return pegTable;
+        return pegArray;
     }
 
-    static int countNumberOfPegs(boolean[][] pegs, int pegTableRow) {
+    static int countNumberOfPegs(boolean[][] pegs, int pegArrayRow) {
         int numberOfPegs = 0;
-        for (int x = 0; x < pegs[pegTableRow - 1].length; x++) {
-            if (pegs[pegTableRow - 1][x]) {
+        for (int x = 0; x < pegs[pegArrayRow - 1].length; x++) {
+            if (pegs[pegArrayRow - 1][x]) {
                 numberOfPegs++;
             }
         }
